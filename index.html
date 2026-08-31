@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EngineersVault — Free Engineering Learning Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Editorial+New:ital@0;1&family=Neue+Haas+Grotesk+Display+Pro:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Fallback fonts that load reliably -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LOADING SCREEN
+     ============================================================ -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-count" id="loaderCount">00</div>
+    <div class="loader-line"><div class="loader-progress" id="loaderProgress"></div></div>
+    <div class="loader-label">Loading Experience</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CUSTOM CURSOR
+     ============================================================ -->
+<div id="cursor-dot"></div>
+<div id="cursor-circle">
+  <span class="cursor-text">OPEN</span>
+</div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header id="header">
+  <div class="header-logo">
+    <a href="#">Engineers<em>Vault</em></a>
+  </div>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <span class="menu-label">Menu</span>
+    <div class="menu-lines">
+      <span></span>
+      <span></span>
+    </div>
+  </button>
+
+  <!-- Full-screen nav overlay -->
+  <nav class="nav-overlay" id="navOverlay">
+    <div class="nav-overlay-inner">
+      <div class="nav-links">
+        <a href="#subjects" class="nav-link" data-index="(01)">Subjects</a>
+        <a href="https://nptel.ac.in" target="_blank" class="nav-link" data-index="(02)">NPTEL</a>
+        <a href="https://ocw.mit.edu" target="_blank" class="nav-link" data-index="(03)">MIT OCW</a>
+        <a href="https://youtube.com" target="_blank" class="nav-link" data-index="(04)">YouTube</a>
+      </div>
+      <div class="nav-footer">
+        <div class="nav-stat">(60+) Playlists</div>
+        <div class="nav-stat">(18) Free Books</div>
+        <div class="nav-stat">(10) Disciplines</div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero" id="home">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-tag">Free · Open · Zero Paywalls</span>
+    <span class="eyebrow-year">Est. 2024©</span>
+  </div>
+
+  <div class="hero-headline">
+    <div class="headline-row">
+      <span class="headline-word" data-reveal>Engineers</span>
+    </div>
+    <div class="headline-row headline-row--italic">
+      <span class="headline-word italic-word" data-reveal>Vault</span>
+    </div>
+    <div class="headline-row">
+      <span class="headline-word" data-reveal>Learning</span>
+    </div>
+    <div class="headline-row">
+      <span class="headline-word" data-reveal>Hub.</span>
+    </div>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="hero-desc">
+      <p>Curated YouTube playlists, free textbooks &amp; open-access courses organised by discipline — sourced from NPTEL, MIT OCW, Stanford, and the world's best educators.</p>
+    </div>
+    <div class="hero-cta">
+      <a href="#subjects" class="cta-btn magnetic" data-magnetic>
+        <span>Explore Subjects</span>
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 8h14M9 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </a>
+      <a href="https://nptel.ac.in" target="_blank" class="cta-link">NPTEL Courses ↗</a>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     COUNTERS / STATS BAR
+     ============================================================ -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-label">(a.) Playlists</span>
+    <span class="stat-num" data-target="60">00</span>
+    <span class="stat-suffix">+</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">(b.) Free Books</span>
+    <span class="stat-num" data-target="18">00</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">(c.) Disciplines</span>
+    <span class="stat-num" data-target="10">00</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">(d.) Hours</span>
+    <span class="stat-num" data-target="1200">0000</span>
+    <span class="stat-suffix">+</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     SEARCH + FILTER
+     ============================================================ -->
+<div class="search-filter-section">
+  <div class="search-row">
+    <div class="section-index">(filter)</div>
+    <div class="search-input-wrap">
+      <input type="text" id="searchInput" placeholder="Search subjects, playlists, topics, channels…" autocomplete="off">
+      <div class="search-results-count" id="resultsCount"></div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="cs">Computer Science</button>
+      <button class="filter-btn" data-filter="ai">AI &amp; ML</button>
+      <button class="filter-btn" data-filter="ds">Data Science</button>
+      <button class="filter-btn" data-filter="net">Networks &amp; Security</button>
+      <button class="filter-btn" data-filter="elec">Electrical</button>
+      <button class="filter-btn" data-filter="mech">Mechanical</button>
+      <button class="filter-btn" data-filter="civil">Civil</button>
+      <button class="filter-btn" data-filter="chem">Chemical</button>
+      <button class="filter-btn" data-filter="math">Mathematics</button>
+      <button class="filter-btn" data-filter="bio">Biomedical</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SUBJECTS — Accordion list, Evolve project-list style
+     ============================================================ -->
+<section class="subjects-section" id="subjects">
+  <div class="subjects-header">
+    <div class="subjects-header-left">
+      <span class="section-index">(subjects)</span>
+    </div>
+    <div class="subjects-header-right">
+      <span>Discipline</span>
+      <span>Playlists</span>
+      <span>Books</span>
+      <span class="col-hide-sm">Topics</span>
+    </div>
+  </div>
+
+  <!-- Injected by app.js -->
+  <div id="subjectsList"></div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="footer-headline">
+    <span>Engineers</span><em>Vault</em>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-col-label">(a.) Sources</div>
+      <a href="https://youtube.com" target="_blank">YouTube</a>
+      <a href="https://nptel.ac.in" target="_blank">NPTEL</a>
+      <a href="https://ocw.mit.edu" target="_blank">MIT OCW</a>
+      <a href="https://cs50.harvard.edu" target="_blank">Harvard CS50</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-label">(b.) Disciplines</div>
+      <span>Computer Science</span>
+      <span>AI &amp; Machine Learning</span>
+      <span>Electrical Engineering</span>
+      <span>Mechanical Engineering</span>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-label">(c.) Info</div>
+      <span>No ads. No paywalls.</span>
+      <span>No logins required.</span>
+      <span>Built for engineers.</span>
+      <span>Est. 2024©</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>©2024 EngineersVault — All resources belong to their respective creators.</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
