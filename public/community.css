@@ -1,0 +1,374 @@
+/* Community workspaces reuse the library's type, paper, and blue palette. */
+.community-main {
+  padding-top: 44px;
+  padding-bottom: 65px;
+  min-height: 75vh;
+}
+.community-heading {
+  margin-bottom: 30px;
+}
+.community-heading h1 {
+  font: 500 clamp(30px, 4vw, 43px)/1.15 var(--serif);
+  letter-spacing: -1px;
+  margin: 0 0 12px;
+}
+.community-heading p,
+.panel-description {
+  color: var(--muted);
+  max-width: 75ch;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+.page-notice {
+  padding: 13px 17px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--muted);
+}
+.page-notice.error,
+.form-error {
+  color: #a12736;
+}
+.auth-panel {
+  max-width: 510px;
+  margin: 35px auto;
+  padding: 32px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+.auth-panel h2 {
+  margin: 0 0 12px;
+  font-size: 23px;
+}
+.auth-panel > p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.community-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #cad8e8;
+  margin-bottom: 24px;
+  padding-bottom: 13px;
+}
+.community-tabs a,
+.community-tabs button {
+  padding: 10px 15px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 14px;
+  min-height: 42px;
+}
+.community-tabs .active,
+.community-tabs button[aria-pressed="true"] {
+  color: white;
+  background: var(--ink);
+}
+.community-panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 30px;
+}
+.community-panel h2 {
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  margin: 0 0 15px;
+}
+.community-panel h3 {
+  font-size: 17px;
+  letter-spacing: -0.2px;
+  margin: 25px 0 15px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+.section-heading h2 {
+  margin: 0;
+}
+.stacked-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  max-width: 720px;
+}
+.stacked-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.stacked-form input,
+.stacked-form select,
+.stacked-form textarea {
+  padding: 11px 12px;
+  border: 1px solid #bdcddd;
+  border-radius: 5px;
+  background: white;
+  color: var(--ink);
+  width: 100%;
+  font-size: 16px;
+  min-height: 44px;
+}
+.stacked-form textarea {
+  resize: vertical;
+}
+.stacked-form .primary-button,
+.stacked-form .secondary-button,
+.stacked-form .danger-button {
+  align-self: flex-start;
+}
+.form-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.field-help,
+.optional {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.form-error {
+  margin: 0;
+  padding: 10px 13px;
+  background: #fff0f1;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.secondary-button {
+  border: 1px solid #bccddd;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 13px;
+  min-height: 42px;
+}
+.danger-button {
+  border: 1px solid #c28f98;
+  color: #a12736;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 13px;
+  min-height: 42px;
+}
+.text-button {
+  background: none;
+  border: 0;
+  padding: 8px;
+  color: var(--muted);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.account-summary {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 25px;
+  padding: 24px;
+  background: #f0f5fc;
+  border-radius: 6px;
+  margin: 15px 0 30px;
+}
+.credit-balance {
+  font-family: var(--serif);
+  font-size: 43px;
+  line-height: 1.2;
+  display: block;
+}
+.permission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+}
+.permission-list p {
+  margin: 0;
+  color: var(--muted);
+}
+.permission-list strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.submission-item,
+.ledger-item,
+.audit-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.submission-item h4 {
+  font-size: 15px;
+  margin: 0 0 5px;
+  font-weight: 600;
+}
+.submission-item p,
+.ledger-item p,
+.audit-item p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0;
+}
+.submission-item a,
+.review-item a {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.status-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  background: #e6eefb;
+  color: #244e92;
+  margin-right: 9px;
+}
+.status-pill.approved {
+  color: #1b614a;
+  background: #e5f3ec;
+}
+.status-pill.rejected {
+  color: #9b2b3c;
+  background: #fbe8ec;
+}
+.ledger-item,
+.audit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  font-size: 13px;
+}
+.ledger-item strong {
+  white-space: nowrap;
+  color: var(--blue);
+}
+.quiet-empty {
+  color: var(--muted);
+  font-size: 14px;
+  background: #f5f8fc;
+  padding: 20px;
+  border-radius: 5px;
+}
+.review-item {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 23px;
+  margin-top: 20px;
+}
+.review-item h3 {
+  margin: 0 0 10px;
+}
+.review-item > p {
+  max-width: 75ch;
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.review-item .stacked-form {
+  margin-top: 22px;
+}
+.review-source {
+  font-size: 12px;
+}
+.admin-divider {
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+  padding-top: 5px;
+}
+.policy-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  text-align: left;
+}
+th,
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  font-weight: 500;
+  color: var(--muted);
+}
+td .field-help {
+  display: block;
+}
+.community-main .toast {
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .community-header .header-inner {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .community-header nav {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 14px;
+    gap: 8px;
+  }
+  .community-header .nav-current:after {
+    bottom: -6px;
+  }
+  .community-header .text-button {
+    min-height: 40px;
+  }
+  .community-main {
+    padding-top: 30px;
+  }
+  .community-panel {
+    padding: 21px;
+  }
+  .auth-panel {
+    padding: 24px;
+  }
+  .form-columns,
+  .policy-fields {
+    grid-template-columns: 1fr;
+  }
+  .community-tabs {
+    gap: 4px;
+  }
+  .community-tabs a,
+  .community-tabs button {
+    padding-inline: 10px;
+    font-size: 12px;
+  }
+  .account-summary {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .review-item {
+    padding: 17px;
+  }
+  .community-heading p {
+    font-size: 14px;
+  }
+  .community-panel h2 {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Community — EngineersVault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="community.css" />
+    <script src="api.js" defer></script>
+    <script src="community.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#communityMain">Skip to community</a>
+    <header class="site-header community-header">
+      <div class="header-inner">
+        <a class="brand" href="/" aria-label="EngineersVault home"
+          ><span class="brand-mark" aria-hidden="true">ev<span>_</span></span
+          ><span>EngineersVault</span></a
+        >
+        <nav aria-label="Main navigation">
+          <a href="/">Library</a
+          ><a class="nav-current" href="#account">Community</a
+          ><button id="logoutButton" class="text-button" hidden>
+            Sign out
+          </button>
+        </nav>
+      </div>
+    </header>
+    <main id="communityMain" class="community-main">
+      <div class="community-heading">
+        <h1>Share what helped you learn.</h1>
+        <p>
+          Contribute a useful resource, help review the library, and build your
+          reputation.
+        </p>
+      </div>
+      <p class="page-notice" id="pageNotice" role="status" aria-live="polite">
+        Connecting to the community…
+      </p>
+      <section
+        id="authPanel"
+        class="auth-panel"
+        hidden
+        aria-labelledby="authTitle"
+      >
+        <h2 id="authTitle">Sign in to contribute</h2>
+        <p>
+          You can browse the library freely. An account lets you submit
+          resources and earn credits.
+        </p>
+        <div class="community-tabs" role="group" aria-label="Account access">
+          <button id="loginMode" type="button" aria-pressed="true">
+            Sign in</button
+          ><button id="registerMode" type="button" aria-pressed="false">
+            Create account
+          </button>
+        </div>
+        <form id="authForm" class="stacked-form">
+          <label id="nameField" hidden
+            >Your name<input
+              name="name"
+              minlength="2"
+              maxlength="80"
+              autocomplete="name" /></label
+          ><label
+            >Email<input
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              maxlength="254" /></label
+          ><label
+            >Password<input
+              name="password"
+              type="password"
+              minlength="12"
+              maxlength="128"
+              autocomplete="current-password"
+              required
+            /><span class="field-help">Use at least 12 characters.</span></label
+          >
+          <p id="authError" class="form-error" role="alert" hidden></p>
+          <button class="primary-button" id="authSubmit" type="submit">
+            Sign in
+          </button>
+        </form>
+      </section>
+      <div id="memberPanel" hidden>
+        <nav
+          class="community-tabs panel-navigation"
+          aria-label="Community sections"
+        >
+          <a href="#account" data-panel="account">My account</a
+          ><a href="#submit" data-panel="submit">Submit a resource</a
+          ><a href="#reviews" data-panel="reviews" id="reviewTab" hidden
+            >Review queue</a
+          ><a href="#admin" data-panel="admin" id="adminTab" hidden
+            >Admin settings</a
+          >
+        </nav>
+        <section
+          id="accountPanel"
+          class="community-panel"
+          aria-labelledby="accountTitle"
+          hidden
+        >
+          <div class="section-heading">
+            <h2 id="accountTitle">My account</h2>
+            <button id="refreshAccount" class="secondary-button" type="button">
+              Refresh
+            </button>
+          </div>
+          <div id="accountSummary" class="account-summary"></div>
+          <h3>Your submissions</h3>
+          <div id="submissionsList" class="submission-list"></div>
+          <h3>Credit history</h3>
+          <div id="creditHistory"></div>
+        </section>
+        <section
+          id="submitPanel"
+          class="community-panel"
+          aria-labelledby="submitTitle"
+          hidden
+        >
+          <h2 id="submitTitle">Submit a resource</h2>
+          <p id="submissionHint" class="panel-description"></p>
+          <form id="resourceForm" class="stacked-form wide-form">
+            <div class="form-columns">
+              <label
+                >Resource type<select name="type">
+                  <option value="video">Course or video</option>
+                  <option value="book">Book</option>
+                </select></label
+              ><label
+                >Discipline<select
+                  name="subject"
+                  id="submissionDiscipline"
+                  required
+                ></select
+              ></label>
+            </div>
+            <label
+              >Title<input
+                name="title"
+                minlength="3"
+                maxlength="200"
+                required
+                placeholder="A clear name for the course or book" /></label
+            ><label
+              >Resource link<input
+                name="url"
+                type="url"
+                maxlength="2048"
+                required
+                placeholder="https://…" /></label
+            ><label
+              >Educator or author<input
+                name="provider"
+                minlength="2"
+                maxlength="160"
+                required /></label
+            ><label
+              >Why is this resource useful?<textarea
+                name="description"
+                rows="4"
+                minlength="20"
+                maxlength="2000"
+                required
+                placeholder="Explain what someone will learn, who it is for, and why you recommend it."
+              ></textarea>
+            </label>
+            <div class="form-columns">
+              <label
+                >Topics <span class="optional">Optional</span
+                ><input
+                  name="topics"
+                  placeholder="Algorithms, sorting, graphs"
+                /><span class="field-help"
+                  >Separate topics with commas; up to 12.</span
+                ></label
+              ><label
+                >Tags <span class="optional">Optional</span
+                ><input name="tags" placeholder="Beginner, Python"
+              /></label>
+            </div>
+            <div class="form-columns">
+              <label
+                >Length <span class="optional">Optional</span
+                ><input
+                  name="videos"
+                  maxlength="60"
+                  placeholder="24 videos or 3 hours" /></label
+              ><label
+                >Notes link <span class="optional">Optional</span
+                ><input
+                  name="notesUrl"
+                  type="url"
+                  maxlength="2048"
+                  placeholder="https://…"
+              /></label>
+            </div>
+            <p id="submissionError" class="form-error" role="alert" hidden></p>
+            <button class="primary-button" type="submit" id="submissionSubmit">
+              Submit for review
+            </button>
+          </form>
+        </section>
+        <section
+          id="reviewsPanel"
+          class="community-panel"
+          aria-labelledby="reviewsTitle"
+          hidden
+        >
+          <div class="section-heading">
+            <h2 id="reviewsTitle">Review queue</h2>
+            <button id="refreshReviews" class="secondary-button" type="button">
+              Refresh queue
+            </button>
+          </div>
+          <p class="panel-description">
+            Check that the link works, the resource is relevant, and its
+            description is accurate. Explain your decision. Your own submissions
+            are excluded.
+          </p>
+          <div id="reviewQueue"></div>
+        </section>
+        <section
+          id="adminPanel"
+          class="community-panel"
+          aria-labelledby="adminTitle"
+          hidden
+        >
+          <h2 id="adminTitle">Community settings</h2>
+          <p class="panel-description">
+            You decide how credits unlock direct posting and reviewing. Changes
+            apply to every user immediately. Admins always retain access.
+          </p>
+          <form id="policyForm" class="stacked-form">
+            <h3>Credit rules</h3>
+            <div class="policy-fields">
+              <label
+                >Credits for an approved resource<input
+                  name="approvalAward"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  required /></label
+              ><label
+                >Credits needed to post directly<input
+                  name="postingThreshold"
+                  type="number"
+                  min="0"
+                  max="1000000"
+                  required /></label
+              ><label
+                >Credits needed to review<input
+                  name="reviewingThreshold"
+                  type="number"
+                  min="0"
+                  max="1000000"
+                  required
+              /></label>
+            </div>
+            <p class="field-help">
+              A threshold of 0 grants that permission to every member. Changing
+              the award affects future approvals; existing credits stay
+              recorded.
+            </p>
+            <p class="form-error" role="alert" hidden></p>
+            <button type="submit" class="primary-button">
+              Save credit rules
+            </button>
+          </form>
+          <div class="admin-divider">
+            <h3>Manage a user's credits</h3>
+            <p class="panel-description">
+              Add or deduct credits with a reason. The user's permissions update
+              automatically.
+            </p>
+            <form id="adjustmentForm" class="stacked-form">
+              <label
+                >User<select name="userId" id="adjustmentUser" required></select
+              ></label>
+              <div class="form-columns">
+                <label
+                  >Credit change<input
+                    name="delta"
+                    type="number"
+                    min="-1000000"
+                    max="1000000"
+                    required
+                    placeholder="10 or -10" /></label
+                ><label
+                  >Reason<input
+                    name="reason"
+                    minlength="5"
+                    maxlength="1000"
+                    required
+                    placeholder="Explain this adjustment"
+                /></label>
+              </div>
+              <p class="form-error" role="alert" hidden></p>
+              <button type="submit" class="secondary-button">
+                Apply credit change
+              </button>
+            </form>
+          </div>
+          <div class="admin-divider">
+            <h3>Members and permissions</h3>
+            <div id="membersList" class="table-scroll"></div>
+          </div>
+          <div class="admin-divider">
+            <h3>Remove a published resource</h3>
+            <p class="panel-description">
+              Hide an unsuitable resource and reverse its earned credits, up to
+              the contributor's current balance. Its history is retained.
+            </p>
+            <form id="withdrawForm" class="stacked-form">
+              <label
+                >Resource<select
+                  name="resourceId"
+                  id="withdrawResource"
+                  required
+                ></select></label
+              ><label
+                >Reason<input
+                  name="reason"
+                  minlength="5"
+                  maxlength="1000"
+                  required
+              /></label>
+              <p class="form-error" role="alert" hidden></p>
+              <button type="submit" class="danger-button">
+                Remove from library
+              </button>
+            </form>
+          </div>
+          <div class="admin-divider">
+            <h3>Recent community activity</h3>
+            <div id="auditList"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="/">EngineersVault</a>
+      <p>A library built by people who keep learning.</p>
+    </footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <noscript
+      ><p class="noscript-message">
+        Enable JavaScript to use community accounts and submissions.
+      </p></noscript
+    >
+  </body>
+</html>
