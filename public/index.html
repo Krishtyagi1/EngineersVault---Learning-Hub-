@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Find free engineering courses, video lectures, and open textbooks in one searchable library."
+    />
+    <meta name="theme-color" content="#edf3f9" />
+    <title>EngineersVault — Your engineering library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="api.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#library">Skip to resources</a>
+    <header class="site-header library-header">
+      <div class="header-inner">
+        <a class="brand" href="./" aria-label="EngineersVault home"
+          ><span class="brand-mark" aria-hidden="true">ev<span>_</span></span
+          ><span>EngineersVault</span></a
+        >
+        <nav aria-label="Main navigation">
+          <a class="nav-current" href="#library">Library</a
+          ><button id="savedNav" class="saved-nav" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 4h12v17l-6-4-6 4z" /></svg
+            >Saved <span id="savedCount">0</span>
+          </button>
+          <a href="community.html#submit" class="contribute-link">Contribute</a>
+          <a href="community.html#account" id="accountLink">Sign in</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="introTitle">
+        <div class="intro-copy">
+          <h1 id="introTitle">Find your next<br />engineering lesson.</h1>
+          <p>
+            Your engineering library, all in one place. Find a lecture, pick up
+            a textbook, and keep learning at your own pace.
+          </p>
+        </div>
+        <div class="library-note">
+          <span class="note-icon" aria-hidden="true"
+            ><svg viewBox="0 0 48 48">
+              <path
+                d="M8 10h12c4 0 4 4 4 4s0-4 4-4h12v29H28c-4 0-4 3-4 3s0-3-4-3H8zM24 14v28M13 19h6M13 25h6M29 19h6M29 25h6"
+              /></svg
+          ></span>
+          <div>
+            <h2>Good resources. Open to everyone.</h2>
+            <p>
+              Lectures and books from MIT, Stanford, NPTEL, Harvard, and
+              independent educators.
+            </p>
+            <span id="catalogSummary" class="catalog-summary"></span>
+          </div>
+        </div>
+      </section>
+      <section class="library" id="library" aria-labelledby="libraryTitle">
+        <div class="library-top">
+          <h2 id="libraryTitle">Explore the library</h2>
+          <span class="free-note"
+            ><span aria-hidden="true"></span>Free to access. No account
+            needed.</span
+          >
+        </div>
+        <form class="search-bar" role="search" id="searchForm">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" />
+            <path d="m16 16 5 5" /></svg
+          ><label class="sr-only" for="searchInput">Search the library</label
+          ><input
+            id="searchInput"
+            type="search"
+            placeholder="Search a topic, course, author, or discipline"
+            autocomplete="off"
+          /><button
+            type="button"
+            id="clearSearch"
+            aria-label="Clear search"
+            hidden
+          >
+            ×</button
+          ><kbd aria-hidden="true">/</kbd>
+        </form>
+        <div class="library-layout">
+          <aside class="discipline-panel" aria-label="Filter by discipline">
+            <h3>Disciplines</h3>
+            <div id="disciplineFilters" class="discipline-filters"></div>
+            <label class="mobile-discipline" for="disciplineSelect"
+              >Discipline<select id="disciplineSelect"></select
+            ></label>
+            <div class="sidebar-note">
+              <strong>Make it your own.</strong>
+              <p>
+                Save resources to build a reading and watching list on this
+                device.
+              </p>
+            </div>
+          </aside>
+          <div class="results-panel">
+            <div class="resource-toolbar">
+              <div class="type-filters" role="group" aria-label="Resource type">
+                <button
+                  type="button"
+                  class="active"
+                  data-type="all"
+                  aria-pressed="true"
+                >
+                  All resources</button
+                ><button type="button" data-type="video" aria-pressed="false">
+                  Courses</button
+                ><button type="button" data-type="book" aria-pressed="false">
+                  Books
+                </button>
+              </div>
+              <button
+                id="savedFilter"
+                class="saved-filter"
+                type="button"
+                aria-pressed="false"
+              >
+                Saved only
+              </button>
+            </div>
+            <div class="results-toolbar">
+              <p
+                id="resultsCount"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              ></p>
+              <label class="sort-control" for="sortSelect"
+                >Sort by<select id="sortSelect" aria-label="Sort by">
+                  <option value="curated">Curated order</option>
+                  <option value="title">Title A–Z</option>
+                  <option value="subject">Discipline</option>
+                </select></label
+              >
+            </div>
+            <div id="activeFilters" class="active-filters" hidden>
+              <span id="filterSummary"></span
+              ><button id="resetFilters" type="button">Clear filters</button>
+            </div>
+            <div
+              id="resourceGrid"
+              class="resource-grid"
+              aria-busy="false"
+            ></div>
+            <div id="emptyState" class="empty-state" hidden>
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <circle cx="21" cy="21" r="13" />
+                <path d="m31 31 10 10M15 21h12" />
+              </svg>
+              <h3 id="emptyTitle">No resources found</h3>
+              <p id="emptyDescription">
+                Try another topic or clear your filters to explore the library.
+              </p>
+              <button type="button" id="emptyReset" class="primary-button">
+                Clear filters
+              </button>
+            </div>
+            <p class="results-end" id="resultsEnd">
+              A place to start. A library to return to.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="./">EngineersVault</a>
+      <p>Built for curious engineers. Resources belong to their creators.</p>
+      <a href="#introTitle">Back to top ↑</a>
+    </footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <noscript
+      ><div class="noscript-message">
+        Enable JavaScript to search the library. You can also explore
+        <a href="https://ocw.mit.edu">MIT OpenCourseWare</a> and
+        <a href="https://nptel.ac.in">NPTEL</a> directly.
+      </div></noscript
+    >
+  </body>
+</html>

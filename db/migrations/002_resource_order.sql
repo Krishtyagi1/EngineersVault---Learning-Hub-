@@ -1,0 +1,1 @@
+ALTER TABLE resources ADD COLUMN sort_order integer NOT NULL DEFAULT 100000;
