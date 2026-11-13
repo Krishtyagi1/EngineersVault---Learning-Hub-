@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -25,7 +25,8 @@
         >
         <nav aria-label="Main navigation">
           <a href="/">Library</a
-          ><a class="nav-current" href="#account">Community</a
+          ><a class="nav-current" href="community.html" aria-current="page"
+            >Community</a
           ><button id="logoutButton" class="text-button" hidden>
             Sign out
           </button>
@@ -34,7 +35,7 @@
     </header>
     <main id="communityMain" class="community-main">
       <div class="community-heading">
-        <h1>Share what helped you learn.</h1>
+        <h1>Share what helped <em>you learn.</em></h1>
         <p>
           Contribute a useful resource, help review the library, and build your
           reputation.
@@ -43,6 +44,9 @@
       <p class="page-notice" id="pageNotice" role="status" aria-live="polite">
         Connecting to the community…
       </p>
+      <button id="retryCommunity" class="secondary-button" type="button" hidden>
+        Retry connection
+      </button>
       <section
         id="authPanel"
         class="auth-panel"
@@ -50,7 +54,7 @@
         aria-labelledby="authTitle"
       >
         <h2 id="authTitle">Sign in to contribute</h2>
-        <p>
+        <p id="authDescription">
           You can browse the library freely. An account lets you submit
           resources and earn credits.
         </p>
@@ -129,7 +133,7 @@
           hidden
         >
           <h2 id="submitTitle">Submit a resource</h2>
-          <p id="submissionHint" class="panel-description"></p>
+          <p id="submissionHint" class="panel-description" role="status"></p>
           <form id="resourceForm" class="stacked-form wide-form">
             <div class="form-columns">
               <label

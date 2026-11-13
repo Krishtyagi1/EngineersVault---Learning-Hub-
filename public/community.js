@@ -22,6 +22,7 @@
     });
   let registering = false,
     subjects = [],
+    catalogError = "",
     toastTimer;
   function notify(message) {
     clearTimeout(toastTimer);
@@ -65,6 +66,10 @@
   }
   function sessionUi() {
     const user = api.session.user;
+    $("authDescription").textContent =
+      location.hash === "#submit"
+        ? "Sign in or create an account to share a course or book. New contributors submit resources for review before they appear in the library."
+        : "You can browse the library freely. An account lets you submit resources and earn credits.";
     $("authPanel").hidden = !!user;
     $("memberPanel").hidden = !user;
     $("logoutButton").hidden = !user;
@@ -158,6 +163,7 @@
   }
   async function showPanel() {
     sessionUi();
+    $("retryCommunity").hidden = true;
     if (!api.session.user) return;
     let panel = location.hash.slice(1) || "account";
     if (!["account", "submit", "reviews", "admin"].includes(panel))
@@ -193,9 +199,12 @@
       if (panel === "admin") await admin();
       if (panel === "submit") {
         const direct = api.session.user.canPostDirectly;
-        $("submissionHint").textContent = direct
-          ? "Your credits let you publish immediately. An independent review is still needed to earn contribution credits."
-          : "A reviewer will check your submission before it appears in the library. Credits are awarded only after approval.";
+        $("submissionHint").textContent =
+          catalogError ||
+          (direct
+            ? "Your credits let you publish immediately. An independent review is still needed to earn contribution credits."
+            : "A reviewer will check your submission before it appears in the library. Credits are awarded only after approval.");
+        $("retryCommunity").hidden = !catalogError;
         $("submissionSubmit").textContent = direct
           ? "Publish resource"
           : "Submit for review";
@@ -246,7 +255,6 @@
       $("resourceForm").reset();
       notify(data.message);
       location.hash = "account";
-      if (location.hash === "#account") await showPanel();
     });
   });
   $("reviewQueue").addEventListener("submit", (event) => {
@@ -307,12 +315,20 @@
   $("refreshReviews").addEventListener("click", () => showPanel());
   window.addEventListener("hashchange", () => showPanel());
   async function init() {
+    $("retryCommunity").hidden = true;
+    notice("Connecting to the community…");
     try {
-      const [catalog] = await Promise.all([
+      const [catalog, session] = await Promise.allSettled([
         api.request("/catalog"),
         api.refresh(),
       ]);
-      subjects = catalog.subjects;
+      if (session.status === "rejected") throw session.reason;
+      subjects = catalog.status === "fulfilled" ? catalog.value.subjects : [];
+      catalogError =
+        catalog.status === "rejected"
+          ? "Disciplines are unavailable. Retry the connection to submit a resource."
+          : "";
+      $("submissionSubmit").disabled = !!catalogError;
       $("submissionDiscipline").innerHTML = subjects
         .map(
           (subject) =>
@@ -324,7 +340,14 @@
       await showPanel();
     } catch (error) {
       notice(error.message, true);
+      $("retryCommunity").hidden = false;
     }
   }
+  $("retryCommunity").addEventListener("click", async () => {
+    await init();
+    if (!$("retryCommunity").hidden) $("retryCommunity").focus();
+    else if (!$("submitPanel").hidden) $("submissionDiscipline").focus();
+    else if (!$("authPanel").hidden) $("authForm").elements.email.focus();
+  });
   init();
 })();

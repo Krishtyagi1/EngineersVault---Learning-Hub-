@@ -133,9 +133,9 @@
       `${matching.length} resource${matching.length === 1 ? "" : "s"}${state.subject === "all" ? "" : ` in ${subjects.get(state.subject).label}`}`;
     $("savedCount").textContent = saved.size;
     $("savedFilter").setAttribute("aria-pressed", String(state.savedOnly));
+    $("savedNav").setAttribute("aria-pressed", String(state.savedOnly));
     $("clearSearch").hidden = !state.query;
     $("emptyState").hidden = matching.length > 0;
-    $("resultsEnd").hidden = !matching.length;
     $("emptyTitle").textContent =
       state.savedOnly && !saved.size
         ? "Your saved list starts here"
@@ -179,7 +179,13 @@
     $("searchInput").value = "";
     render();
   }
-  $("searchForm").addEventListener("submit", (event) => event.preventDefault());
+  $("searchForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!$("searchInput").disabled) {
+      $("libraryTitle").focus({ preventScroll: true });
+      $("libraryTitle").scrollIntoView({ behavior: "instant" });
+    }
+  });
   $("searchInput").addEventListener("input", (event) => {
     state.query = event.target.value;
     render();
@@ -212,8 +218,7 @@
     render();
   });
   $("savedNav").addEventListener("click", () => {
-    resetFilters();
-    state.savedOnly = true;
+    state.savedOnly = !state.savedOnly;
     render();
     $("library").scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -226,16 +231,19 @@
     state.sort = event.target.value;
     render();
   });
-  ["resetFilters", "emptyReset"].forEach((id) =>
-    $(id).addEventListener("click", () => {
-      if (catalogFailed) {
-        loadCatalog();
-        return;
-      }
-      resetFilters();
-      $("searchInput").focus({ preventScroll: true });
-    }),
-  );
+  function clearFilters() {
+    resetFilters();
+    $("searchInput").focus();
+  }
+  $("resetFilters").addEventListener("click", clearFilters);
+  $("emptyReset").addEventListener("click", async () => {
+    if (catalogFailed) {
+      await loadCatalog();
+      (catalogFailed ? $("emptyReset") : $("searchInput")).focus();
+    } else {
+      clearFilters();
+    }
+  });
   $("resourceGrid").addEventListener("click", (event) => {
     const button = event.target.closest("[data-save]");
     if (!button) return;
@@ -294,10 +302,16 @@
       const incoming = JSON.parse(event.newValue || "[]");
       saved = new Set(
         Array.isArray(incoming)
-          ? incoming.filter((id) => validIds.has(id))
+          ? incoming.filter((id) =>
+              validIds.size ? validIds.has(id) : typeof id === "string",
+            )
           : [],
       );
-      render();
+      if (
+        !catalogFailed &&
+        $("resourceGrid").getAttribute("aria-busy") === "false"
+      )
+        render();
     } catch {
       /* Ignore malformed storage. */
     }
@@ -306,10 +320,11 @@
     catalogFailed = false;
     $("resourceGrid").setAttribute("aria-busy", "true");
     $("resultsCount").textContent = "Loading the library…";
-    $("searchInput").disabled = true;
-    document
-      .querySelectorAll("[data-type]")
-      .forEach((button) => (button.disabled = true));
+    const controls = document.querySelectorAll(
+      "#searchInput, .search-submit, #savedNav, #savedFilter, #sortSelect, #disciplineSelect, [data-type]",
+    );
+    controls.forEach((control) => (control.disabled = true));
+    $("emptyReset").disabled = true;
     try {
       const data = await window.EV.request("/catalog");
       catalogSubjects = data.subjects;
@@ -371,13 +386,10 @@
       $("emptyDescription").textContent = error.message;
       $("emptyReset").textContent = "Retry connection";
       $("resultsCount").textContent = "Could not load resources";
-      $("resultsEnd").hidden = true;
     } finally {
       $("resourceGrid").setAttribute("aria-busy", "false");
-      $("searchInput").disabled = catalogFailed;
-      document
-        .querySelectorAll("[data-type]")
-        .forEach((button) => (button.disabled = catalogFailed));
+      controls.forEach((control) => (control.disabled = catalogFailed));
+      $("emptyReset").disabled = false;
     }
   }
   window.EV.refresh().catch(() => {});

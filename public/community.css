@@ -1,15 +1,15 @@
-/* Community workspaces reuse the library's type, paper, and blue palette. */
 .community-main {
   padding-top: 44px;
   padding-bottom: 65px;
   min-height: 75vh;
 }
 .community-heading {
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
 }
 .community-heading h1 {
-  font: 500 clamp(30px, 4vw, 43px)/1.15 var(--serif);
-  letter-spacing: -1px;
+  font-size: clamp(44px, 6vw, 72px);
   margin: 0 0 12px;
 }
 .community-heading p,
@@ -32,11 +32,11 @@
 }
 .auth-panel {
   max-width: 510px;
-  margin: 35px auto;
+  margin-block: 26px;
   padding: 32px;
   background: white;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 14px;
 }
 .auth-panel h2 {
   margin: 0 0 12px;
@@ -50,7 +50,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  border-bottom: 1px solid #cad8e8;
+  border-bottom: 1px solid var(--line);
   margin-bottom: 24px;
   padding-bottom: 13px;
 }
@@ -71,7 +71,7 @@
 .community-panel {
   background: white;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 14px;
   padding: 30px;
 }
 .community-panel h2 {
@@ -111,7 +111,7 @@
 .stacked-form select,
 .stacked-form textarea {
   padding: 11px 12px;
-  border: 1px solid #bdcddd;
+  border: 1px solid #aeb2cc;
   border-radius: 5px;
   background: white;
   color: var(--ink);
@@ -147,7 +147,7 @@
   font-size: 13px;
 }
 .secondary-button {
-  border: 1px solid #bccddd;
+  border: 1px solid #aeb2cc;
   background: white;
   padding: 10px 15px;
   border-radius: 5px;
@@ -169,16 +169,12 @@
   padding: 8px;
   color: var(--muted);
 }
-button:disabled {
-  opacity: 0.55;
-  cursor: wait;
-}
 .account-summary {
   display: grid;
   grid-template-columns: 160px 1fr;
   gap: 25px;
   padding: 24px;
-  background: #f0f5fc;
+  background: var(--soft);
   border-radius: 6px;
   margin: 15px 0 30px;
 }
@@ -230,8 +226,8 @@ button:disabled {
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
-  background: #e6eefb;
-  color: #244e92;
+  background: var(--soft);
+  color: var(--blue);
   margin-right: 9px;
 }
 .status-pill.approved {
@@ -257,7 +253,7 @@ button:disabled {
 .quiet-empty {
   color: var(--muted);
   font-size: 14px;
-  background: #f5f8fc;
+  background: #f0f0f7;
   padding: 20px;
   border-radius: 5px;
 }

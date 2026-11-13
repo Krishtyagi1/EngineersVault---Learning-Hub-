@@ -7,12 +7,12 @@
       name="description"
       content="Find free engineering courses, video lectures, and open textbooks in one searchable library."
     />
-    <meta name="theme-color" content="#edf3f9" />
+    <meta name="theme-color" content="#f7f7f2" />
     <title>EngineersVault — Your engineering library</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -28,8 +28,13 @@
           ><span>EngineersVault</span></a
         >
         <nav aria-label="Main navigation">
-          <a class="nav-current" href="#library">Library</a
-          ><button id="savedNav" class="saved-nav" type="button">
+          <a class="nav-current" href="#library" aria-current="page">Library</a
+          ><button
+            id="savedNav"
+            class="saved-nav"
+            type="button"
+            aria-pressed="false"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 4h12v17l-6-4-6 4z" /></svg
             >Saved <span id="savedCount">0</span>
@@ -42,56 +47,51 @@
     <main>
       <section class="intro" aria-labelledby="introTitle">
         <div class="intro-copy">
-          <h1 id="introTitle">Find your next<br />engineering lesson.</h1>
+          <h1 id="introTitle">The open library for <em>engineers.</em></h1>
           <p>
-            Your engineering library, all in one place. Find a lecture, pick up
-            a textbook, and keep learning at your own pace.
+            Find free lecture series and open textbooks from MIT, Stanford,
+            NPTEL, and independent educators.
           </p>
+          <form class="search-bar" role="search" id="searchForm">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 5 5" /></svg
+            ><label class="sr-only" for="searchInput">Search the library</label
+            ><input
+              id="searchInput"
+              type="search"
+              placeholder="Courses, books, or topics"
+              autocomplete="off"
+            /><button
+              type="button"
+              id="clearSearch"
+              aria-label="Clear search"
+              hidden
+            >
+              ×</button
+            ><button
+              class="primary-button search-submit"
+              type="submit"
+              disabled
+            >
+              Search
+            </button>
+          </form>
+          <p id="catalogSummary" class="catalog-summary"></p>
         </div>
-        <div class="library-note">
-          <span class="note-icon" aria-hidden="true"
-            ><svg viewBox="0 0 48 48">
-              <path
-                d="M8 10h12c4 0 4 4 4 4s0-4 4-4h12v29H28c-4 0-4 3-4 3s0-3-4-3H8zM24 14v28M13 19h6M13 25h6M29 19h6M29 25h6"
-              /></svg
-          ></span>
-          <div>
-            <h2>Good resources. Open to everyone.</h2>
-            <p>
-              Lectures and books from MIT, Stanford, NPTEL, Harvard, and
-              independent educators.
-            </p>
-            <span id="catalogSummary" class="catalog-summary"></span>
-          </div>
-        </div>
+        <img
+          class="intro-image"
+          src="bridge.jpg"
+          alt=""
+          width="960"
+          height="640"
+        />
       </section>
       <section class="library" id="library" aria-labelledby="libraryTitle">
         <div class="library-top">
-          <h2 id="libraryTitle">Explore the library</h2>
-          <span class="free-note"
-            ><span aria-hidden="true"></span>Free to access. No account
-            needed.</span
-          >
+          <h2 id="libraryTitle" tabindex="-1">Browse resources</h2>
+          <p class="free-note">Free to access. No account needed.</p>
         </div>
-        <form class="search-bar" role="search" id="searchForm">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5" />
-            <path d="m16 16 5 5" /></svg
-          ><label class="sr-only" for="searchInput">Search the library</label
-          ><input
-            id="searchInput"
-            type="search"
-            placeholder="Search a topic, course, author, or discipline"
-            autocomplete="off"
-          /><button
-            type="button"
-            id="clearSearch"
-            aria-label="Clear search"
-            hidden
-          >
-            ×</button
-          ><kbd aria-hidden="true">/</kbd>
-        </form>
         <div class="library-layout">
           <aside class="discipline-panel" aria-label="Filter by discipline">
             <h3>Disciplines</h3>
@@ -99,13 +99,6 @@
             <label class="mobile-discipline" for="disciplineSelect"
               >Discipline<select id="disciplineSelect"></select
             ></label>
-            <div class="sidebar-note">
-              <strong>Make it your own.</strong>
-              <p>
-                Save resources to build a reading and watching list on this
-                device.
-              </p>
-            </div>
           </aside>
           <div class="results-panel">
             <div class="resource-toolbar">
@@ -169,9 +162,6 @@
                 Clear filters
               </button>
             </div>
-            <p class="results-end" id="resultsEnd">
-              A place to start. A library to return to.
-            </p>
           </div>
         </div>
       </section>
