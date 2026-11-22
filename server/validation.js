@@ -56,8 +56,8 @@ function stringList(value, label) {
   return [...new Set(value.map((item) => text(item, label, 1, 80)))];
 }
 export function resource(body) {
-  if (!["video", "book"].includes(body.type))
-    fail(400, "Choose a course or book.");
+  if (!["video", "book", "note"].includes(body.type))
+    fail(400, "Choose a playlist or course, book, or notes.");
   const link = url(body.url);
   let thumbnail = null;
   const parsed = new URL(link);
@@ -81,8 +81,14 @@ export function resource(body) {
     ),
     topics: stringList(body.topics, "Topics"),
     tags: stringList(body.tags, "Tags"),
-    videos: body.videos ? text(body.videos, "Length", 1, 60) : null,
-    notesUrl: body.notesUrl ? url(body.notesUrl, "Notes link") : null,
+    videos:
+      body.type === "video" && body.videos
+        ? text(body.videos, "Length", 1, 60)
+        : null,
+    notesUrl:
+      body.type !== "note" && body.notesUrl
+        ? url(body.notesUrl, "Notes link")
+        : null,
     thumbnail,
   };
 }

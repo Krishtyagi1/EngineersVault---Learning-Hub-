@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:net";
 import { resolve, relative } from "node:path";
-import { rm, mkdir } from "node:fs/promises";
+import { rm, mkdir, readFile } from "node:fs/promises";
 import { randomUUID, randomBytes } from "node:crypto";
 import EmbeddedPostgres from "embedded-postgres";
 import { createPool, migrate, seed, canonicalUrl } from "../server/db.js";
@@ -50,6 +50,40 @@ test(
     pool = createPool(
       `postgresql://ev_test:${secret}@127.0.0.1:${port}/postgres`,
     );
+    await pool.query("CREATE TABLE schema_migrations (name text PRIMARY KEY)");
+    for (const name of ["001_initial.sql", "002_resource_order.sql"]) {
+      await pool.query(
+        await readFile(
+          new URL(`../db/migrations/${name}`, import.meta.url),
+          "utf8",
+        ),
+      );
+      await pool.query("INSERT INTO schema_migrations(name) VALUES($1)", [
+        name,
+      ]);
+    }
+    const seedCatalog = JSON.parse(
+      await readFile(
+        new URL("../db/seed/catalog.json", import.meta.url),
+        "utf8",
+      ),
+    );
+    const operatingSystemsBook = seedCatalog.books.find(
+      (item) => item.title === "Operating Systems: Three Easy Pieces",
+    );
+    await pool.query(
+      "INSERT INTO disciplines VALUES('cs','Computer Science','CS overview',0)",
+    );
+    const legacy = (
+      await pool.query(
+        "INSERT INTO resources(title,type,discipline_id,provider,url,status,published) VALUES($1,'book','cs',$2,$3,'approved',true) RETURNING id",
+        [
+          operatingSystemsBook.title,
+          operatingSystemsBook.author,
+          canonicalUrl(operatingSystemsBook.url),
+        ],
+      )
+    ).rows[0];
     await migrate(pool);
     await migrate(pool);
     await seed(pool);
@@ -113,8 +147,12 @@ test(
     await pool.query("UPDATE users SET role='admin' WHERE id=$1", [owner.id]);
     const catalog = await anonymous.request("/catalog");
     assert.equal(catalog.status, 200);
-    assert.equal(catalog.data.resources.length, 58);
-    assert.equal(catalog.data.subjects.length, 10);
+    assert.equal(catalog.data.resources.length, 61);
+    assert.equal(catalog.data.subjects.length, 35);
+    assert.equal(
+      catalog.data.resources.find((item) => item.id === legacy.id).subject,
+      "operating-systems",
+    );
     assert.equal(
       catalog.data.resources[0].title,
       "CS50 – Introduction to Computer Science",
@@ -122,6 +160,73 @@ test(
     assert.equal((await anonymous.request("/admin")).status, 401);
     assert.equal((await author.request("/admin")).status, 403);
     assert.equal((await author.request("/reviews")).status, 403);
+    await t.test(
+      "subject suggestions stay private until reviewed once",
+      async () => {
+        const suggestion = {
+          label: "Computing Education",
+          description: "How people learn and teach computer science.",
+        };
+        const submit = (client, body = suggestion) =>
+          client.request("/subjects", { method: "POST", body });
+        assert.equal((await submit(anonymous)).status, 401);
+        assert.equal(
+          (
+            await submit(author, {
+              ...suggestion,
+              label: " operating systems ",
+            })
+          ).status,
+          409,
+        );
+        const created = await submit(author);
+        assert.equal(created.status, 201);
+        const id = created.data.subject.id;
+        assert.equal(
+          (
+            await submit(author, {
+              ...suggestion,
+              label: " computing   education ",
+            })
+          ).status,
+          409,
+        );
+        assert.ok(
+          !(await anonymous.request("/catalog")).data.subjects.some(
+            (item) => item.id === id,
+          ),
+        );
+        assert.ok(
+          (await admin.request("/reviews")).data.subjects.some(
+            (item) => item.id === id,
+          ),
+        );
+        assert.equal(
+          (await author.request("/account")).data.subjectSubmissions[0].status,
+          "pending",
+        );
+        const approve = () =>
+          admin.request(`/reviews/subjects/${id}`, {
+            method: "POST",
+            body: {
+              decision: "approved",
+              reason: "Relevant undergraduate subject.",
+            },
+          });
+        assert.deepEqual(
+          (await Promise.all([approve(), approve()]))
+            .map((result) => result.status)
+            .sort(),
+          [200, 409],
+        );
+        assert.ok(
+          (await anonymous.request("/catalog")).data.subjects.some(
+            (item) => item.id === id,
+          ),
+        );
+        assert.equal((await author.request("/me")).data.user.credits, 0);
+      },
+    );
     assert.equal(
       (
         await admin.request("/admin/policy", {
@@ -174,6 +279,53 @@ test(
       topics: ["Algorithms"],
       tags: ["Beginner"],
     });
+    await t.test(
+      "standalone note links use the resource review queue",
+      async () => {
+        const pending = await author.request("/resources", {
+          method: "POST",
+          body: {
+            ...submission("notes"),
+            type: "note",
+            subject: "discrete-math",
+          },
+        });
+        assert.equal(pending.status, 201);
+        const id = pending.data.resource.id;
+        assert.ok(
+          !(await anonymous.request("/catalog")).data.resources.some(
+            (item) => item.id === id,
+          ),
+        );
+        assert.equal(
+          (
+            await admin.request(`/reviews/${id}`, {
+              method: "POST",
+              body: {
+                decision: "approved",
+                reason: "Useful notes for this course.",
+              },
+            })
+          ).status,
+          200,
+        );
+        assert.equal(
+          (await anonymous.request("/catalog")).data.resources.find(
+            (item) => item.id === id,
+          ).type,
+          "note",
+        );
+        assert.equal((await author.request("/me")).data.user.credits, 7);
+        const withdrawal = await admin.request(
+          `/admin/resources/${id}/withdraw`,
+          {
+            method: "POST",
+            body: { reason: "End of the notes test." },
+          },
+        );
+        assert.equal(withdrawal.status, 200);
+      },
+    );
     assert.equal(
       (
         await author.request("/resources", {

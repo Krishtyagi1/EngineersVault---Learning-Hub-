@@ -22,6 +22,11 @@
   };
   const icon = (name) =>
     `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
+  const types = {
+    video: { filter: "Courses", add: "Add playlist", open: "Open course" },
+    book: { filter: "Books", add: "Add book", open: "Read book" },
+    note: { filter: "Notes", add: "Add notes", open: "Read notes" },
+  };
   let subjects = new Map();
   let catalogSubjects = [];
   let resources = [];
@@ -56,61 +61,79 @@
   }
   function renderCard(item) {
     const title = escapeHtml(item.title),
-      subject = escapeHtml(subjects.get(item.subject).label);
+      subject = escapeHtml(subjects.get(item.subject).label),
+      type = types[item.type];
     const media =
       item.type === "video"
-        ? `<div class="resource-media"><img src="${escapeHtml(item.thumb)}" alt="" loading="lazy" decoding="async"><span class="media-fallback" aria-hidden="true">${icon("play")}</span><span class="resource-badge">${icon("play")}${escapeHtml(item.videos)}</span>${saveButton(item)}</div>`
-        : `<div class="resource-media book-media"><div class="book-cover" aria-hidden="true">${icon("book")}<span>${title}</span></div><span class="resource-badge">${icon("book")}Open textbook</span>${saveButton(item)}</div>`;
-    return `<article class="resource-card ${item.type === "book" ? "book-card" : ""}" data-subject="${item.subject}" data-resource-id="${escapeHtml(item.id)}">${media}<div class="card-content"><p class="card-subject">${subject}</p><h3>${title}</h3><p class="card-provider">${escapeHtml(item.provider)}</p>${item.description ? `<p class="resource-description">${escapeHtml(item.description)}</p>` : ""}${item.status === "pending" ? `<p class="pending-note">Published; awaiting independent review</p>` : ""}${item.tags.length ? `<div class="card-tags">${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}<div class="card-actions"><a class="resource-open" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="${item.type === "book" ? "Read" : "Open"} ${title} (opens in a new tab)">${item.type === "book" ? "Read book" : "Open course"}${icon("open")}</a>${item.notes ? `<a class="notes-link" href="${escapeHtml(item.notes.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(item.notes.label)} for ${title} (opens in a new tab)">Course notes</a>` : ""}</div>${item.topics.length ? `<details class="course-details"><summary>Topics covered</summary><ul>${item.topics.map((topic) => `<li>${escapeHtml(topic)}</li>`).join("")}</ul></details>` : ""}</div></article>`;
+        ? `<div class="resource-media">${item.thumb ? `<img src="${escapeHtml(item.thumb)}" alt="" loading="lazy" decoding="async">` : ""}<span class="media-fallback" aria-hidden="true">${icon("play")}</span><span class="resource-badge">${icon("play")}${escapeHtml(item.videos)}</span>${saveButton(item)}</div>`
+        : `<div class="resource-media book-media"><div class="book-cover" aria-hidden="true">${icon("book")}<span>${title}</span></div><span class="resource-badge">${icon("book")}${item.type === "note" ? "Study notes" : "Open textbook"}</span>${saveButton(item)}</div>`;
+    return `<article class="resource-card ${item.type !== "video" ? "book-card" : ""}" data-resource-id="${escapeHtml(item.id)}">${media}<div class="card-content"><p class="card-subject">${subject}</p><h3>${title}</h3><p class="card-provider">${escapeHtml(item.provider)}</p>${item.description ? `<p class="resource-description">${escapeHtml(item.description)}</p>` : ""}${item.status === "pending" ? `<p class="pending-note">Published and awaiting independent review</p>` : ""}${item.tags.length ? `<div class="card-tags">${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}<div class="card-actions"><a class="resource-open" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" aria-label="${type.open}: ${title} (opens in a new tab)">${type.open}${icon("open")}</a>${item.notes ? `<a class="notes-link" href="${escapeHtml(item.notes.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(item.notes.label)} for ${title} (opens in a new tab)">Course notes</a>` : ""}</div>${item.topics.length ? `<details class="course-details"><summary>Topics covered</summary><ul>${item.topics.map((topic) => `<li>${escapeHtml(topic)}</li>`).join("")}</ul></details>` : ""}</div></article>`;
   }
-  function matchingResources(ignoreSubject = false) {
-    const terms = state.query
-      .trim()
-      .toLocaleLowerCase()
-      .split(/\s+/)
-      .filter(Boolean);
-    return resources.filter(
-      (item) =>
-        (ignoreSubject ||
-          state.subject === "all" ||
-          state.subject === item.subject) &&
-        (state.type === "all" || state.type === item.type) &&
-        (!state.savedOnly || saved.has(item.id)) &&
-        terms.every((term) => item.search.includes(term)),
-    );
-  }
-  function renderDisciplines() {
-    const matching = matchingResources(true);
-    $("disciplineFilters").innerHTML = [
-      { id: "all", label: "All disciplines" },
-      ...catalogSubjects,
-    ]
-      .map(
-        (subject) =>
-          `<button type="button" class="discipline-button ${state.subject === subject.id ? "active" : ""}" data-subject="${subject.id}" aria-pressed="${state.subject === subject.id}"><span>${escapeHtml(subject.label)}</span><span class="count">${matching.filter((item) => subject.id === "all" || item.subject === subject.id).length}</span></button>`,
-      )
+  function renderSubject(subject, items, open) {
+    const id = escapeHtml(subject.id),
+      title = escapeHtml(subject.label);
+    const addLinks = Object.entries(types)
+      .map(([type, { add }]) => {
+        const query = new URLSearchParams({ subject: subject.id, type });
+        return `<a class="subject-add" href="community.html?${escapeHtml(query)}#submit" aria-label="${add} to ${title}">+ ${add}</a>`;
+      })
       .join("");
-    $("disciplineSelect").value = state.subject;
+    return `<details class="subject-section" data-subject="${id}"${open ? " open" : ""}>
+      <summary><strong>${title}</strong><span>${items.length} ${items.length === 1 ? "resource" : "resources"}</span></summary>
+      <div class="subject-content"><p>${escapeHtml(subject.desc)}</p>
+        <div class="subject-actions">${addLinks}</div>
+        ${items.length ? `<div class="resource-grid">${items.map(renderCard).join("")}</div>` : state.query.trim() || state.type !== "all" || state.savedOnly ? "<p>No resources match these filters.</p>" : "<p>No resources here yet.</p>"}
+      </div>
+    </details>`;
   }
-  function render() {
-    const focusedSubject = document.activeElement?.dataset.subject;
+  function render({ expandMatches = false } = {}) {
+    const openSubjects = new Set(
+      [...$("resourceGrid").querySelectorAll(".subject-section[open]")].map(
+        (details) => details.dataset.subject,
+      ),
+    );
     const openTopics = new Set(
       [...$("resourceGrid").querySelectorAll(".course-details[open]")].map(
         (details) => details.closest("[data-resource-id]").dataset.resourceId,
       ),
     );
-    const matching = matchingResources();
+    const terms = state.query
+      .trim()
+      .toLocaleLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    const matching = resources.filter(
+      (item) =>
+        (state.subject === "all" || state.subject === item.subject) &&
+        (state.type === "all" || state.type === item.type) &&
+        (!state.savedOnly || saved.has(item.id)) &&
+        terms.every((term) => item.search.includes(term)),
+    );
     if (state.sort === "title")
       matching.sort((a, b) => a.title.localeCompare(b.title));
+    const groups = new Map();
+    for (const item of matching) {
+      if (!groups.has(item.subject)) groups.set(item.subject, []);
+      groups.get(item.subject).push(item);
+    }
+    const visibleSubjects = catalogSubjects.filter((subject) => {
+      if (state.subject !== "all") return subject.id === state.subject;
+      if (groups.has(subject.id)) return true;
+      if (state.savedOnly || state.type !== "all") return false;
+      const search = `${subject.label} ${subject.desc}`.toLocaleLowerCase();
+      return terms.every((term) => search.includes(term));
+    });
     if (state.sort === "subject")
-      matching.sort(
-        (a, b) =>
-          subjects
-            .get(a.subject)
-            .label.localeCompare(subjects.get(b.subject).label) ||
-          a.title.localeCompare(b.title),
-      );
-    $("resourceGrid").innerHTML = matching.map(renderCard).join("");
+      visibleSubjects.sort((a, b) => a.label.localeCompare(b.label));
+    $("resourceGrid").innerHTML = visibleSubjects
+      .map((subject) =>
+        renderSubject(
+          subject,
+          groups.get(subject.id) || [],
+          openSubjects.has(subject.id) || expandMatches,
+        ),
+      )
+      .join("");
     $("resourceGrid")
       .querySelectorAll(".course-details")
       .forEach((details) => {
@@ -135,25 +158,21 @@
     $("savedFilter").setAttribute("aria-pressed", String(state.savedOnly));
     $("savedNav").setAttribute("aria-pressed", String(state.savedOnly));
     $("clearSearch").hidden = !state.query;
-    $("emptyState").hidden = matching.length > 0;
+    $("emptyState").hidden = visibleSubjects.length > 0;
     $("emptyTitle").textContent =
       state.savedOnly && !saved.size
         ? "Your saved list starts here"
         : "No resources found";
     $("emptyDescription").textContent =
       state.savedOnly && !saved.size
-        ? "Use the bookmark on a course or book to save it for later. Your list stays on this device."
+        ? "Use the bookmark on a resource to save it for later. Your list stays on this device."
         : "Try a broader search or clear your filters to explore the library.";
     $("emptyReset").textContent =
       state.savedOnly && !saved.size ? "Explore resources" : "Clear filters";
     const filterText = [
       state.query.trim() ? `Search: “${state.query.trim()}”` : "",
       state.subject !== "all" ? subjects.get(state.subject).label : "",
-      state.type !== "all"
-        ? state.type === "video"
-          ? "Courses"
-          : "Books"
-        : "",
+      types[state.type]?.filter,
       state.savedOnly ? "Saved resources" : "",
     ].filter(Boolean);
     $("activeFilters").hidden = !filterText.length;
@@ -163,11 +182,7 @@
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
     });
-    renderDisciplines();
-    if (focusedSubject)
-      $("disciplineFilters")
-        .querySelector(`[data-subject="${focusedSubject}"]`)
-        ?.focus({ preventScroll: true });
+    $("disciplineSelect").value = state.subject;
   }
   function resetFilters() {
     Object.assign(state, {
@@ -177,7 +192,7 @@
       savedOnly: false,
     });
     $("searchInput").value = "";
-    render();
+    render({ expandMatches: !!state.query.trim() });
   }
   $("searchForm").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -188,7 +203,7 @@
   });
   $("searchInput").addEventListener("input", (event) => {
     state.query = event.target.value;
-    render();
+    render({ expandMatches: !!state.query.trim() });
   });
   $("clearSearch").addEventListener("click", () => {
     state.query = "";
@@ -196,30 +211,23 @@
     render();
     $("searchInput").focus();
   });
-  $("disciplineFilters").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-subject]");
-    if (button) {
-      state.subject = button.dataset.subject;
-      render();
-    }
-  });
   $("disciplineSelect").addEventListener("change", (event) => {
     state.subject = event.target.value;
-    render();
+    render({ expandMatches: state.subject !== "all" });
   });
   document.querySelectorAll("[data-type]").forEach((button) =>
     button.addEventListener("click", () => {
       state.type = button.dataset.type;
-      render();
+      render({ expandMatches: state.type !== "all" });
     }),
   );
   $("savedFilter").addEventListener("click", () => {
     state.savedOnly = !state.savedOnly;
-    render();
+    render({ expandMatches: state.savedOnly });
   });
   $("savedNav").addEventListener("click", () => {
     state.savedOnly = !state.savedOnly;
-    render();
+    render({ expandMatches: state.savedOnly });
     $("library").scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "instant"
@@ -258,14 +266,20 @@
       persisted = false;
     }
     const index = [
-      ...$("resourceGrid").querySelectorAll("[data-save]"),
+      ...$("resourceGrid").querySelectorAll(
+        ".subject-section[open] [data-save]",
+      ),
     ].indexOf(button);
     render();
-    const nextButtons = [...$("resourceGrid").querySelectorAll("[data-save]")];
+    const nextButtons = [
+      ...$("resourceGrid").querySelectorAll(
+        ".subject-section[open] [data-save]",
+      ),
+    ];
     (
       nextButtons.find((next) => next.dataset.save === id) ||
       nextButtons[Math.min(index, nextButtons.length - 1)] ||
-      $("emptyReset")
+      ($("emptyState").hidden ? $("libraryTitle") : $("emptyReset"))
     ).focus({ preventScroll: true });
     toast(
       persisted
@@ -355,7 +369,7 @@
               saved.has(item.id) ||
               [...saved].some(
                 (id) =>
-                  id.startsWith(`${item.type}:${item.subject}:`) &&
+                  id.startsWith(`${item.type}:`) &&
                   id.endsWith(`:${item.title}`),
               ),
           )
@@ -367,14 +381,14 @@
         /* Optional local storage. */
       }
       $("catalogSummary").textContent =
-        `${resources.filter((item) => item.type === "video").length} courses, ${resources.filter((item) => item.type === "book").length} books, ${catalogSubjects.length} disciplines`;
+        `${resources.length} resources across ${catalogSubjects.length} subjects`;
       $("disciplineSelect").innerHTML = [
-        { id: "all", label: "All disciplines" },
+        { id: "all", label: "All subjects" },
         ...catalogSubjects,
       ]
         .map(
           (subject) =>
-            `<option value="${subject.id}">${escapeHtml(subject.label)}</option>`,
+            `<option value="${escapeHtml(subject.id)}">${escapeHtml(subject.label)}</option>`,
         )
         .join("");
       render();
