@@ -60,7 +60,7 @@
             ><input
               id="searchInput"
               type="search"
-              placeholder="Courses, books, or topics"
+              placeholder="Subjects, resources, or topics"
               autocomplete="off"
             /><button
               type="button"
@@ -89,79 +89,73 @@
       </section>
       <section class="library" id="library" aria-labelledby="libraryTitle">
         <div class="library-top">
-          <h2 id="libraryTitle" tabindex="-1">Browse resources</h2>
-          <p class="free-note">Free to access. No account needed.</p>
+          <h2 id="libraryTitle" tabindex="-1">Browse subjects</h2>
+          <a href="community.html#subject" class="primary-button"
+            >+ Add subject</a
+          >
         </div>
-        <div class="library-layout">
-          <aside class="discipline-panel" aria-label="Filter by discipline">
-            <h3>Disciplines</h3>
-            <div id="disciplineFilters" class="discipline-filters"></div>
-            <label class="mobile-discipline" for="disciplineSelect"
-              >Discipline<select id="disciplineSelect"></select
-            ></label>
-          </aside>
-          <div class="results-panel">
-            <div class="resource-toolbar">
-              <div class="type-filters" role="group" aria-label="Resource type">
-                <button
-                  type="button"
-                  class="active"
-                  data-type="all"
-                  aria-pressed="true"
-                >
-                  All resources</button
-                ><button type="button" data-type="video" aria-pressed="false">
-                  Courses</button
-                ><button type="button" data-type="book" aria-pressed="false">
-                  Books
-                </button>
-              </div>
+        <div class="results-panel">
+          <div class="resource-toolbar">
+            <div class="type-filters" role="group" aria-label="Resource type">
               <button
-                id="savedFilter"
-                class="saved-filter"
                 type="button"
-                aria-pressed="false"
+                class="active"
+                data-type="all"
+                aria-pressed="true"
               >
-                Saved only
+                All resources</button
+              ><button type="button" data-type="video" aria-pressed="false">
+                Courses</button
+              ><button type="button" data-type="book" aria-pressed="false">
+                Books</button
+              ><button type="button" data-type="note" aria-pressed="false">
+                Notes
               </button>
             </div>
-            <div class="results-toolbar">
-              <p
-                id="resultsCount"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-              ></p>
-              <label class="sort-control" for="sortSelect"
-                >Sort by<select id="sortSelect" aria-label="Sort by">
-                  <option value="curated">Curated order</option>
-                  <option value="title">Title A–Z</option>
-                  <option value="subject">Discipline</option>
-                </select></label
-              >
-            </div>
-            <div id="activeFilters" class="active-filters" hidden>
-              <span id="filterSummary"></span
-              ><button id="resetFilters" type="button">Clear filters</button>
-            </div>
-            <div
-              id="resourceGrid"
-              class="resource-grid"
-              aria-busy="false"
-            ></div>
-            <div id="emptyState" class="empty-state" hidden>
-              <svg viewBox="0 0 48 48" aria-hidden="true">
-                <circle cx="21" cy="21" r="13" />
-                <path d="m31 31 10 10M15 21h12" />
-              </svg>
-              <h3 id="emptyTitle">No resources found</h3>
-              <p id="emptyDescription">
-                Try another topic or clear your filters to explore the library.
-              </p>
-              <button type="button" id="emptyReset" class="primary-button">
-                Clear filters
-              </button>
-            </div>
+            <button
+              id="savedFilter"
+              class="saved-filter"
+              type="button"
+              aria-pressed="false"
+            >
+              Saved only
+            </button>
+          </div>
+          <div class="results-toolbar">
+            <p
+              id="resultsCount"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            ></p>
+            <label class="sort-control" for="disciplineSelect"
+              >Subject<select id="disciplineSelect"></select
+            ></label>
+            <label class="sort-control" for="sortSelect"
+              >Sort by<select id="sortSelect" aria-label="Sort by">
+                <option value="curated">Curated order</option>
+                <option value="title">Resource title A–Z</option>
+                <option value="subject">Subject A–Z</option>
+              </select></label
+            >
+          </div>
+          <div id="activeFilters" class="active-filters" hidden>
+            <span id="filterSummary"></span
+            ><button id="resetFilters" type="button">Clear filters</button>
+          </div>
+          <div id="resourceGrid" class="subject-list" aria-busy="false"></div>
+          <div id="emptyState" class="empty-state" hidden>
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="21" cy="21" r="13" />
+              <path d="m31 31 10 10M15 21h12" />
+            </svg>
+            <h3 id="emptyTitle">No resources found</h3>
+            <p id="emptyDescription">
+              Try another topic or clear your filters to explore the library.
+            </p>
+            <button type="button" id="emptyReset" class="primary-button">
+              Clear filters
+            </button>
           </div>
         </div>
       </section>

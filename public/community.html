@@ -102,6 +102,7 @@
         >
           <a href="#account" data-panel="account">My account</a
           ><a href="#submit" data-panel="submit">Submit a resource</a
+          ><a href="#subject" data-panel="subject">Add subject</a
           ><a href="#reviews" data-panel="reviews" id="reviewTab" hidden
             >Review queue</a
           ><a href="#admin" data-panel="admin" id="adminTab" hidden
@@ -123,6 +124,8 @@
           <div id="accountSummary" class="account-summary"></div>
           <h3>Your submissions</h3>
           <div id="submissionsList" class="submission-list"></div>
+          <h3>Your subject suggestions</h3>
+          <div id="subjectSubmissionsList" class="submission-list"></div>
           <h3>Credit history</h3>
           <div id="creditHistory"></div>
         </section>
@@ -138,11 +141,14 @@
             <div class="form-columns">
               <label
                 >Resource type<select name="type">
-                  <option value="video">Course or video</option>
+                  <option value="video">
+                    YouTube playlist or video course
+                  </option>
                   <option value="book">Book</option>
+                  <option value="note">Study notes</option>
                 </select></label
               ><label
-                >Discipline<select
+                >Subject<select
                   name="subject"
                   id="submissionDiscipline"
                   required
@@ -155,14 +161,18 @@
                 minlength="3"
                 maxlength="200"
                 required
-                placeholder="A clear name for the course or book" /></label
+                placeholder="A clear name for the resource" /></label
             ><label
               >Resource link<input
                 name="url"
+                aria-describedby="resourceLinkHelp"
                 type="url"
                 maxlength="2048"
                 required
-                placeholder="https://…" /></label
+                placeholder="https://…" /><span
+                id="resourceLinkHelp"
+                class="field-help"
+              ></span></label
             ><label
               >Educator or author<input
                 name="provider"
@@ -216,6 +226,40 @@
           </form>
         </section>
         <section
+          id="subjectPanel"
+          class="community-panel"
+          aria-labelledby="subjectTitle"
+          hidden
+        >
+          <h2 id="subjectTitle">Add a subject</h2>
+          <p class="panel-description">
+            Suggest a subject missing from the library. Once a reviewer approves
+            it, anyone can browse it and members can add resources.
+          </p>
+          <form id="subjectForm" class="stacked-form wide-form">
+            <label
+              >Subject name<input
+                name="label"
+                minlength="2"
+                maxlength="100"
+                required
+            /></label>
+            <label
+              >What does this subject cover?<textarea
+                name="description"
+                rows="4"
+                minlength="10"
+                maxlength="500"
+                required
+              ></textarea>
+            </label>
+            <p class="form-error" role="alert" hidden></p>
+            <button class="primary-button" type="submit">
+              Submit for review
+            </button>
+          </form>
+        </section>
+        <section
           id="reviewsPanel"
           class="community-panel"
           aria-labelledby="reviewsTitle"
@@ -232,7 +276,10 @@
             description is accurate. Explain your decision. Your own submissions
             are excluded.
           </p>
+          <h3>Resource submissions</h3>
           <div id="reviewQueue"></div>
+          <h3>Subject suggestions</h3>
+          <div id="subjectReviewQueue"></div>
         </section>
         <section
           id="adminPanel"

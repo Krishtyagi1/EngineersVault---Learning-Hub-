@@ -68,13 +68,28 @@
     const user = api.session.user;
     $("authDescription").textContent =
       location.hash === "#submit"
-        ? "Sign in or create an account to share a course or book. New contributors submit resources for review before they appear in the library."
-        : "You can browse the library freely. An account lets you submit resources and earn credits.";
+        ? "Sign in or create an account to share a playlist, book, or notes."
+        : location.hash === "#subject"
+          ? "Sign in or create an account to suggest a subject."
+          : "You can browse the library freely. An account lets you submit resources and earn credits.";
     $("authPanel").hidden = !!user;
     $("memberPanel").hidden = !user;
     $("logoutButton").hidden = !user;
     $("reviewTab").hidden = !user?.canReview;
     $("adminTab").hidden = !user?.admin;
+  }
+  function resourceTypeUi() {
+    const form = $("resourceForm");
+    const type = form.elements.type.value;
+    $("resourceLinkHelp").textContent = {
+      video: "Use a public link, such as a YouTube playlist URL.",
+      book: "Use a public link where readers can access the book.",
+      note: "Use a publicly readable link to the notes.",
+    }[type];
+    const length = form.elements.videos;
+    const notes = form.elements.notesUrl;
+    length.closest("label").hidden = length.disabled = type !== "video";
+    notes.closest("label").hidden = notes.disabled = type === "note";
   }
   function status(item) {
     return item.status === "pending"
@@ -100,7 +115,15 @@
               `<article class="submission-item"><h4>${esc(item.title)}</h4><span class="status-pill ${item.status}">${status(item)}</span><span class="field-help">${date(item.createdAt)}</span>${item.reviewNote ? `<p>Review: ${esc(item.reviewNote)}</p>` : ""}<p><a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">View resource</a></p></article>`,
           )
           .join("")
-      : '<p class="quiet-empty">You have not submitted a resource yet. Share a course or book that helped you understand a topic.</p>';
+      : '<p class="quiet-empty">You have not submitted a resource yet.</p>';
+    $("subjectSubmissionsList").innerHTML = data.subjectSubmissions.length
+      ? data.subjectSubmissions
+          .map(
+            (item) =>
+              `<article class="submission-item"><h4>${esc(item.label)}</h4><span class="status-pill ${item.status}">${status(item)}</span><span class="field-help">${date(item.created_at)}</span>${item.review_note ? `<p>Review: ${esc(item.review_note)}</p>` : ""}</article>`,
+          )
+          .join("")
+      : '<p class="quiet-empty">You have not suggested a subject yet.</p>';
     $("creditHistory").innerHTML = data.ledger.length
       ? data.ledger
           .map(
@@ -110,16 +133,26 @@
           .join("")
       : '<p class="quiet-empty">Your first approved contribution will start your credit history.</p>';
   }
+  const reviewForm = (target) =>
+    `<form class="review-form stacked-form" data-review-target="${esc(target)}"><div class="form-columns"><label>Decision<select name="decision"><option value="approved">Approve</option><option value="rejected">Reject</option></select></label><label>Explanation<input name="reason" minlength="5" maxlength="1000" required placeholder="Explain your decision to the contributor"></label></div><p class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Record decision</button></form>`;
   async function reviews() {
     const data = await api.request("/reviews");
     $("reviewQueue").innerHTML = data.resources.length
       ? data.resources
           .map(
             (item) =>
-              `<article class="review-item"><h3>${esc(item.title)}</h3><p class="review-source">${esc(item.submittedBy)} • ${esc(item.provider)} • ${esc(subjects.find((subject) => subject.id === item.subject)?.label)}</p><p>${esc(item.description)}</p><p><a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">Open resource in a new tab</a></p>${item.topics.length ? `<p>Topics: ${item.topics.map(esc).join(", ")}</p>` : ""}<span class="status-pill">${item.published ? "Already published by a trusted contributor" : "Waiting to be published"}</span><form class="review-form stacked-form" data-resource="${item.id}"><div class="form-columns"><label>Decision<select name="decision"><option value="approved">Approve</option><option value="rejected">Reject</option></select></label><label>Explanation<input name="reason" minlength="5" maxlength="1000" required placeholder="Explain your decision to the contributor"></label></div><p class="form-error" role="alert" hidden></p><button class="primary-button" type="submit">Record decision</button></form></article>`,
+              `<article class="review-item"><h3>${esc(item.title)}</h3><p class="review-source">${esc(item.submittedBy)} • ${esc(item.provider)} • ${esc(subjects.find((subject) => subject.id === item.subject)?.label)}</p><p>${esc(item.description)}</p><p><a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">Open resource in a new tab</a></p>${item.notes ? `<p><a href="${esc(item.notes.url)}" target="_blank" rel="noopener noreferrer">Open attached notes</a></p>` : ""}${item.topics.length ? `<p>Topics: ${item.topics.map(esc).join(", ")}</p>` : ""}<span class="status-pill">${item.published ? "Already published by a trusted contributor" : "Waiting to be published"}</span>${reviewForm(item.id)}</article>`,
           )
           .join("")
       : '<p class="quiet-empty">The review queue is clear. New submissions from other members will appear here.</p>';
+    $("subjectReviewQueue").innerHTML = data.subjects.length
+      ? data.subjects
+          .map(
+            (item) =>
+              `<article class="review-item"><h4>${esc(item.label)}</h4><p class="review-source">${esc(item.submitted_by)}</p><p>${esc(item.description)}</p>${reviewForm("subjects/" + item.id)}</article>`,
+          )
+          .join("")
+      : '<p class="quiet-empty">No subject suggestions are awaiting review.</p>';
   }
   async function admin() {
     const [data, catalog] = await Promise.all([
@@ -150,6 +183,9 @@
       "resource.rejected": "Resource rejected",
       "resource.submitted": "Resource submitted",
       "resource.withdrawn": "Resource removed",
+      "subject.submitted": "Subject suggested",
+      "subject.approved": "Subject approved",
+      "subject.rejected": "Subject rejected",
       "admin.granted": "Admin access granted",
     };
     $("auditList").innerHTML = data.audit.length
@@ -166,7 +202,7 @@
     $("retryCommunity").hidden = true;
     if (!api.session.user) return;
     let panel = location.hash.slice(1) || "account";
-    if (!["account", "submit", "reviews", "admin"].includes(panel))
+    if (!["account", "submit", "subject", "reviews", "admin"].includes(panel))
       panel = "account";
     if (panel === "reviews" && !api.session.user.canReview) panel = "account";
     if (panel === "admin" && !api.session.user.admin) panel = "account";
@@ -253,23 +289,36 @@
           .filter(Boolean);
       const data = await api.request("/resources", { method: "POST", body });
       $("resourceForm").reset();
+      resourceTypeUi();
       notify(data.message);
       location.hash = "account";
     });
   });
-  $("reviewQueue").addEventListener("submit", (event) => {
+  $("resourceForm").elements.type.addEventListener("change", resourceTypeUi);
+  $("subjectForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    formAction(event.currentTarget, async (body) => {
+      const data = await api.request("/subjects", { method: "POST", body });
+      $("subjectForm").reset();
+      notify(data.message);
+      location.hash = "account";
+    });
+  });
+  $("reviewsPanel").addEventListener("submit", (event) => {
     if (!event.target.matches(".review-form")) return;
     event.preventDefault();
     const form = event.target;
     formAction(form, async (body) => {
-      await api.request(`/reviews/${form.dataset.resource}`, {
+      await api.request(`/reviews/${form.dataset.reviewTarget}`, {
         method: "POST",
         body,
       });
       notify(
         body.decision === "approved"
-          ? "Resource approved and credits awarded"
-          : "Resource rejected",
+          ? form.dataset.reviewTarget.startsWith("subjects/")
+            ? "Subject approved and published"
+            : "Resource approved and credits awarded"
+          : "Submission rejected",
       );
       await reviews();
     });
@@ -326,15 +375,26 @@
       subjects = catalog.status === "fulfilled" ? catalog.value.subjects : [];
       catalogError =
         catalog.status === "rejected"
-          ? "Disciplines are unavailable. Retry the connection to submit a resource."
+          ? "Subjects are unavailable. Retry the connection to submit a resource."
           : "";
       $("submissionSubmit").disabled = !!catalogError;
       $("submissionDiscipline").innerHTML = subjects
         .map(
           (subject) =>
-            `<option value="${subject.id}">${esc(subject.label)}</option>`,
+            `<option value="${esc(subject.id)}">${esc(subject.label)}</option>`,
         )
         .join("");
+      const query = new URLSearchParams(location.search);
+      const form = $("resourceForm");
+      if (location.hash === "#submit") {
+        const target = query.get("subject");
+        if (subjects.some((subject) => subject.id === target))
+          form.elements.subject.value = target;
+        const type = query.get("type");
+        if (["video", "book", "note"].includes(type))
+          form.elements.type.value = type;
+      }
+      resourceTypeUi();
       notice("");
       sessionUi();
       await showPanel();

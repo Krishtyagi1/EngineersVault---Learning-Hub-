@@ -234,6 +234,7 @@ main {
 }
 .library-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
@@ -244,11 +245,6 @@ main {
 .library-top h2 {
   font: 400 clamp(34px, 4vw, 48px)/1 var(--serif);
   margin: 0;
-}
-.free-note {
-  color: var(--muted);
-  margin: 0;
-  font-size: 13px;
 }
 .search-bar {
   background: var(--paper);
@@ -298,60 +294,72 @@ main {
 .search-submit {
   min-height: 44px;
 }
-.library-layout {
+.subject-list {
   display: grid;
-  grid-template-columns: 218px minmax(0, 1fr);
-  gap: 30px;
+  gap: 10px;
 }
-.discipline-panel {
-  align-self: start;
-  position: sticky;
-  top: 108px;
+.subject-section {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
 }
-.discipline-panel h3 {
-  font-size: 13px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  color: var(--ink);
-}
-.discipline-filters {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.discipline-button {
-  display: flex;
+.subject-section > summary {
+  min-height: 54px;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  border: 0;
-  background: transparent;
-  border-radius: 6px;
-  min-height: 42px;
-  padding: 9px 11px;
-  font-size: 14px;
-  line-height: 1.35;
+  gap: 10px;
+  border-radius: inherit;
+  cursor: pointer;
+  overflow-wrap: anywhere;
 }
-.discipline-button:hover {
-  background: #eeeef7;
-}
-.discipline-button.active {
-  background: #e9eaff;
-  color: #343bb2;
-  font-weight: 600;
-}
-.discipline-button .count {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 400;
-}
-.discipline-button.active .count {
-  color: #343bb2;
-}
-.mobile-discipline {
+.subject-section > summary::-webkit-details-marker {
   display: none;
+}
+.subject-section > summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.subject-section[open] > summary::after {
+  transform: rotate(225deg);
+}
+.subject-section > summary:hover,
+.subject-add:hover {
+  background: #e9eaff;
+}
+.subject-section > summary span,
+.subject-content > p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.subject-content {
+  border-top: 1px solid var(--line);
+  padding: 0 16px 16px;
+}
+.subject-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.subject-add,
+.library-top > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.subject-add {
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--blue);
+  font-size: 13px;
 }
 .resource-toolbar {
   display: flex;
@@ -396,6 +404,7 @@ main {
 }
 .results-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 15px;
@@ -765,10 +774,6 @@ main {
   .resource-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .library-layout {
-    grid-template-columns: 200px minmax(0, 1fr);
-    gap: 28px;
-  }
   .site-footer {
     margin: 0 40px;
   }
@@ -789,33 +794,6 @@ main {
   }
   .intro h1 {
     font-size: clamp(49px, 8vw, 64px);
-  }
-  .library-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .discipline-panel {
-    position: static;
-  }
-  .discipline-panel h3,
-  .discipline-filters {
-    display: none;
-  }
-  .mobile-discipline {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .mobile-discipline select {
-    border: 1px solid #aeb2cc;
-    border-radius: 6px;
-    padding: 10px;
-    background: white;
-    color: var(--ink);
-    flex: 1;
-    min-width: 0;
   }
   .site-footer {
     margin: 0 24px;
@@ -934,9 +912,6 @@ main {
   .active-filters {
     align-items: center;
   }
-  .free-note {
-    font-size: 12px;
-  }
 }
 @media (max-width: 360px) {
   .header-inner {
@@ -983,8 +958,9 @@ main {
 .saved-filter {
   min-height: 44px;
 }
-.mobile-discipline select {
+#disciplineSelect {
   min-height: 44px;
+  max-width: min(48vw, 20rem);
 }
 
 /* Community links and database resource descriptions. */

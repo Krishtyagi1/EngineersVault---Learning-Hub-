@@ -110,7 +110,7 @@
     {
       "title": "Data Structures & Algorithms – Abdul Bari",
       "channel": "Abdul Bari",
-      "subject": "cs",
+      "subject": "dsa",
       "videos": "86 videos",
       "thumb": "https://img.youtube.com/vi/0IAPZzGSbME/hqdefault.jpg",
       "url": "https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O",
@@ -131,7 +131,7 @@
     {
       "title": "MIT 6.006 – Introduction to Algorithms",
       "channel": "MIT OpenCourseWare",
-      "subject": "cs",
+      "subject": "algorithm-design",
       "videos": "47 videos",
       "thumb": "https://img.youtube.com/vi/HtSuA80QTyo/hqdefault.jpg",
       "url": "https://www.youtube.com/playlist?list=PLUl4u3cNGP61Oq3tWYp6V_F-5jb5L2iHb",
@@ -155,7 +155,7 @@
     {
       "title": "Operating Systems – Neso Academy",
       "channel": "Neso Academy",
-      "subject": "cs",
+      "subject": "operating-systems",
       "videos": "100 videos",
       "thumb": "https://img.youtube.com/vi/vBURTt97EkA/hqdefault.jpg",
       "url": "https://www.youtube.com/playlist?list=PLBlnK6fEyqRiVhbXDGLXDk_OQAeuVcp2O",
@@ -174,7 +174,7 @@
     {
       "title": "Computer Networks – Neso Academy",
       "channel": "Neso Academy",
-      "subject": "cs",
+      "subject": "networks",
       "videos": "90 videos",
       "thumb": "https://img.youtube.com/vi/JFF2vJaN0Cw/hqdefault.jpg",
       "url": "https://www.youtube.com/playlist?list=PLBlnK6fEyqRgMCUAG0XRw78UA8qnv6jEx",
@@ -193,7 +193,7 @@
     {
       "title": "Database Management Systems (NPTEL)",
       "channel": "NPTEL IIT Madras",
-      "subject": "cs",
+      "subject": "databases",
       "videos": "38 videos",
       "thumb": "https://img.youtube.com/vi/kBdlM6hNDAE/hqdefault.jpg",
       "url": "https://nptel.ac.in/courses/106/106/106106093/",
@@ -216,7 +216,7 @@
     {
       "title": "Object Oriented Programming – Java",
       "channel": "Telusko",
-      "subject": "cs",
+      "subject": "oop",
       "videos": "85 videos",
       "thumb": "https://img.youtube.com/vi/BSVKUk58K6U/hqdefault.jpg",
       "url": "https://www.youtube.com/playlist?list=PLsyeobzWxl7pe_IiTfNyr55kwJPWbgxB5",
@@ -235,7 +235,7 @@
     {
       "title": "Compiler Design (NPTEL)",
       "channel": "NPTEL",
-      "subject": "cs",
+      "subject": "compilers",
       "videos": "36 videos",
       "thumb": "https://img.youtube.com/vi/Qkwj65l_96I/hqdefault.jpg",
       "url": "https://nptel.ac.in/courses/106/105/106105121/",
@@ -254,7 +254,7 @@
     {
       "title": "Theory of Computation (NPTEL)",
       "channel": "NPTEL IIT Kanpur",
-      "subject": "cs",
+      "subject": "computation-theory",
       "videos": "40 videos",
       "thumb": "https://img.youtube.com/vi/eqCkkC9A0Q4/hqdefault.jpg",
       "url": "https://nptel.ac.in/courses/106/104/106104028/",
@@ -476,7 +476,7 @@
     {
       "title": "Cyber Security Full Course",
       "channel": "Simplilearn",
-      "subject": "net",
+      "subject": "security",
       "videos": "10 hours",
       "thumb": "https://img.youtube.com/vi/z5nc9MDbvkw/hqdefault.jpg",
       "url": "https://www.youtube.com/watch?v=z5nc9MDbvkw",
@@ -495,7 +495,7 @@
     {
       "title": "Computer Networks (NPTEL IIT Kharagpur)",
       "channel": "NPTEL",
-      "subject": "net",
+      "subject": "networks",
       "videos": "58 videos",
       "thumb": "https://img.youtube.com/vi/IkVM8oFG4Ak/hqdefault.jpg",
       "url": "https://nptel.ac.in/courses/106/105/106105081/",
@@ -518,7 +518,7 @@
     {
       "title": "Cryptography & Network Security",
       "channel": "NPTEL IIT Kharagpur",
-      "subject": "net",
+      "subject": "security",
       "videos": "38 videos",
       "thumb": "https://img.youtube.com/vi/t-rOT6BcEyk/hqdefault.jpg",
       "url": "https://nptel.ac.in/courses/106/105/106105031/",
@@ -955,28 +955,28 @@
     {
       "title": "Structure & Interpretation of Computer Programs",
       "author": "Abelson & Sussman (MIT)",
-      "subject": "cs",
+      "subject": "languages",
       "icon": "💻",
       "url": "https://web.mit.edu/6.001/6.037/sicp.pdf"
     },
     {
       "title": "Operating Systems: Three Easy Pieces",
       "author": "Arpaci-Dusseau (Wisconsin)",
-      "subject": "cs",
+      "subject": "operating-systems",
       "icon": "🖥️",
       "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/"
     },
     {
       "title": "Computer Networks: A Systems Approach",
       "author": "Peterson & Davie",
-      "subject": "cs",
+      "subject": "networks",
       "icon": "🌐",
       "url": "https://book.systemsapproach.org/"
     },
     {
       "title": "Think Python 2nd Edition",
       "author": "Allen Downey",
-      "subject": "cs",
+      "subject": "programming",
       "icon": "🐍",
       "url": "https://greenteapress.com/wp/think-python-2e/"
     },
@@ -1077,6 +1077,26 @@
       "subject": "bio",
       "icon": "🫀",
       "url": "https://www.bem.fi/book/"
+    },
+    {
+      "title": "Mathematics for Computer Science",
+      "subject": "discrete-math",
+      "author": "MIT OpenCourseWare",
+      "url": "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/mit6_042js15_textbook.pdf"
+    },
+    {
+      "title": "Principles of Computer System Design, Part II",
+      "subject": "systems",
+      "author": "Jerome H. Saltzer and M. Frans Kaashoek",
+      "url": "https://ocw.mit.edu/courses/res-6-004-principles-of-computer-system-design-an-introduction-spring-2009/e962408d900226fef264fd1cd1b81468_part_ii_open_5_0.pdf"
+    }
+  ],
+  "notes": [
+    {
+      "title": "User Interface Design and Implementation: Usability",
+      "subject": "hci",
+      "provider": "MIT OpenCourseWare",
+      "url": "https://ocw.mit.edu/courses/6-831-user-interface-design-and-implementation-spring-2011/40197883e8b9a2404ca5df7224ccc878_MIT6_831S11_lec01.pdf"
     }
   ]
 }

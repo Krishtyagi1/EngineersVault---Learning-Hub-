@@ -1,4 +1,5 @@
 import express from "express";
+import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { transaction } from "./db.js";
 import {
@@ -175,17 +176,53 @@ export function createApp(
     }),
   );
   app.get("/api/catalog", async (req, res) => {
-    const [subjects, items] = await Promise.all([
-      pool.query(
-        "SELECT id,label,description AS desc FROM disciplines ORDER BY position",
-      ),
-      pool.query(
-        "SELECT r.*,u.name AS author_name FROM resources r LEFT JOIN users u ON u.id=r.submitted_by WHERE r.published=true ORDER BY r.sort_order,r.created_at,r.id",
-      ),
-    ]);
+    const items = await pool.query(
+      "SELECT r.*,u.name AS author_name FROM resources r LEFT JOIN users u ON u.id=r.submitted_by WHERE r.published=true ORDER BY r.sort_order,r.created_at,r.id",
+    );
+    const subjects = await pool.query(
+      "SELECT id,label,description AS desc FROM disciplines ORDER BY position,label,id",
+    );
     res.json({
       subjects: subjects.rows,
       resources: items.rows.map(toResource),
+    });
+  });
+  app.post("/api/subjects", requireUser, csrf, async (req, res) => {
+    const label = text(req.body.label, "Subject name", 2, 100).replace(
+      /\s+/g,
+      " ",
+    );
+    const description = text(
+      req.body.description,
+      "Subject description",
+      10,
+      500,
+    );
+    const subject = await transaction(pool, async (client) => {
+      if (
+        (
+          await client.query(
+            "SELECT 1 FROM disciplines WHERE lower(label)=lower($1)",
+            [label],
+          )
+        ).rowCount
+      )
+        fail(409, "This subject is already in the library.");
+      const row = (
+        await client.query(
+          "INSERT INTO subject_submissions(id,label,description,submitted_by) VALUES($1,$2,$3,$4) RETURNING id,label,description,status",
+          [randomBytes(10).toString("hex"), label, description, req.user.id],
+        )
+      ).rows[0];
+      await audit(client, req.user.id, "subject.submitted", {
+        subjectId: row.id,
+      });
+      return row;
+    });
+    res.status(201).json({
+      subject,
+      message:
+        "Subject submitted for review. It will appear in the library when approved.",
     });
   });
   app.post("/api/auth/register", async (req, res) => {
@@ -296,7 +333,7 @@ export function createApp(
     });
   });
   app.get("/api/account", requireUser, async (req, res) => {
-    const [items, ledger] = await Promise.all([
+    const [items, ledger, subjects] = await Promise.all([
       pool.query(
         "SELECT * FROM resources WHERE submitted_by=$1 ORDER BY created_at DESC",
         [req.user.id],
@@ -305,11 +342,16 @@ export function createApp(
         "SELECT delta,reason,created_at FROM credit_ledger WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100",
         [req.user.id],
       ),
+      pool.query(
+        "SELECT id,label,created_at,status,review_note FROM subject_submissions WHERE submitted_by=$1 ORDER BY created_at DESC",
+        [req.user.id],
+      ),
     ]);
     res.json({
       user: publicUser(req.user, req.policy),
       policy: req.policy,
       submissions: items.rows.map(toResource),
+      subjectSubmissions: subjects.rows,
       ledger: ledger.rows,
     });
   });
@@ -320,8 +362,63 @@ export function createApp(
         [req.user.id],
       )
     ).rows;
-    res.json({ resources: rows.map(toResource) });
+    const subjects = await pool.query(
+      "SELECT s.id,s.label,s.description,u.name AS submitted_by FROM subject_submissions s JOIN users u ON u.id=s.submitted_by WHERE s.status='pending' AND s.submitted_by<>$1 ORDER BY s.created_at",
+      [req.user.id],
+    );
+    res.json({ resources: rows.map(toResource), subjects: subjects.rows });
   });
+  app.post(
+    "/api/reviews/subjects/:id",
+    requireUser,
+    csrf,
+    requireReviewer,
+    async (req, res) => {
+      const { id } = req.params;
+      const { decision } = req.body;
+      if (!/^[0-9a-f]{20}$/.test(id)) fail(400, "Invalid subject identifier.");
+      if (!["approved", "rejected"].includes(decision))
+        fail(400, "Choose approve or reject.");
+      const reason = text(req.body.reason, "Review explanation", 5, 1000);
+      await transaction(pool, async (client) => {
+        const policy = (
+          await client.query("SELECT * FROM credit_policy WHERE id=1 FOR SHARE")
+        ).rows[0];
+        const actor = (
+          await client.query("SELECT * FROM users WHERE id=$1 FOR SHARE", [
+            req.user.id,
+          ])
+        ).rows[0];
+        if (!permissions(actor, policy).canReview)
+          fail(403, "Your reviewing permission has changed. Refresh the page.");
+        const subject = (
+          await client.query(
+            "SELECT * FROM subject_submissions WHERE id=$1 FOR UPDATE",
+            [id],
+          )
+        ).rows[0];
+        if (!subject) fail(404, "Subject suggestion not found.");
+        if (subject.submitted_by === actor.id)
+          fail(403, "You cannot review your own submission.");
+        if (subject.status !== "pending")
+          fail(409, "This subject has already been reviewed.");
+        if (decision === "approved")
+          await client.query(
+            "INSERT INTO disciplines(id,label,description,position) VALUES($1,$2,$3,100000)",
+            [id, subject.label, subject.description],
+          );
+        await client.query(
+          "UPDATE subject_submissions SET status=$2,reviewed_by=$3,reviewed_at=now(),review_note=$4 WHERE id=$1",
+          [id, decision, actor.id, reason],
+        );
+        await audit(client, actor.id, `subject.${decision}`, {
+          subjectId: id,
+          reason,
+        });
+      });
+      res.json({ ok: true });
+    },
+  );
   app.post(
     "/api/reviews/:id",
     requireUser,
@@ -561,6 +658,14 @@ export function createApp(
         error.constraint === "users_email_key"
           ? "An account with this email already exists."
           : "This resource link has already been submitted.";
+      if (
+        [
+          "disciplines_label_unique",
+          "subject_submissions_label_unique",
+        ].includes(error.constraint)
+      )
+        message =
+          "This subject has already been suggested or is in the library.";
     }
     if (error.type === "entity.parse.failed") {
       status = 400;

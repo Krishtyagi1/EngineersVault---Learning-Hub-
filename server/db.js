@@ -105,6 +105,7 @@ export async function seed(pool) {
         type: "book",
         provider: item.author,
       })),
+      ...catalog.notes.map((item) => ({ ...item, type: "note" })),
     ];
     for (const [position, item] of items.entries()) {
       const result = await client.query(

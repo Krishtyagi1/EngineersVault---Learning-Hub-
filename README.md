@@ -13,7 +13,7 @@ npm run dev
 
 Open **http://127.0.0.1:3000**. The development command starts Express and a real local PostgreSQL cluster, applies migrations, and imports the starting catalog. Data persists in `.local/postgres`; restarting does not reset accounts or resources. Local credentials and database files are ignored by Git. No Docker or Windows service is needed. PostgreSQL listens on loopback port 55432.
 
-The import contains 58 unique resources across 10 disciplines. The original Structural Analysis and Geotechnical Engineering entries shared a URL, so one duplicate is skipped. Re-running the seed does not overwrite moderation decisions or restore removed resources.
+The starter catalog includes 35 subjects spanning engineering and undergraduate computing. Its computing subjects cover the [17 ACM/IEEE-CS/AAAI CS2023 knowledge areas](https://csed.acm.org/knowledge-areas/) and common courses in the [AICTE undergraduate CSE model](https://www.aicte.gov.in/sites/default/files/Updated-AICTE%20-%20UG%20CSE.pdf). Some subjects are ready for community contributions. Re-running the seed preserves moderation decisions.
 
 ## Become the admin
 
@@ -30,7 +30,8 @@ Only someone with database access can grant the initial admin role. Registration
 
 ## Community workflow
 
-- Everyone can browse. Members submit links with a description, discipline, educator/author, and optional topics/notes.
+- Anyone can expand subjects and browse their resources. Signed-in members can use the links inside a subject to add a playlist, a book, or standalone study notes using a public URL.
+- Members can suggest a missing subject with **Add subject** and track its status under **My account**. An independent eligible reviewer must approve the suggestion before it appears publicly. The credit rules apply to resource links.
 - New contributors enter the review queue. Eligible reviewers approve or reject other people's resources with an explanation.
 - Approval publishes the resource and awards credits in one database transaction. Repeated or concurrent review requests cannot award credits twice.
 - Users meeting the posting threshold can publish immediately. Their resource remains in the review queue for independent credit verification. Direct publishing alone earns no credits.
